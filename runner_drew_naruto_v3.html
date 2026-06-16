@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#0a0500;--panel:#120a00;--inner:#1a0e00;
+  --orange:#ff6b00;--ol:rgba(255,107,0,0.4);--og:rgba(255,107,0,0.12);--ob:#ffaa55;
+  --text:#fff5e8;--t2:#cc8844;--t3:#6b3a10;
+  --green:#00ffaa;--g2:rgba(0,255,170,0.15);
+  --red:#ff3344;--r2:rgba(255,51,68,0.15);
+  --blue:#44aaff;--purple:#aa55ff;
+  --mono:'Courier New',monospace;--orb:'Arial Black',Arial,sans-serif;
+}
+body{background:var(--void);color:var(--text);font-family:var(--mono);padding:20px;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,107,0,0.08) 0%,transparent 70%);pointer-events:none;z-index:0;}
+.wrap{max-width:900px;margin:0 auto;border:1px solid var(--orange);background:var(--panel);padding:24px;position:relative;z-index:1;}
+.wrap::after{content:'';position:absolute;inset:-1px;box-shadow:0 0 30px rgba(255,107,0,0.2);pointer-events:none;}
+.cb{position:absolute;width:20px;height:20px;}
+.cb::before,.cb::after{content:'';position:absolute;background:var(--orange);}
+.cb::before{width:100%;height:2px;}.cb::after{width:2px;height:100%;}
+.cb.tl{top:-2px;left:-2px}.cb.tl::before,.cb.tl::after{top:0;left:0}
+.cb.tr{top:-2px;right:-2px}.cb.tr::before{top:0;right:0}.cb.tr::after{top:0;right:0}
+.cb.bl{bottom:-2px;left:-2px}.cb.bl::before,.cb.bl::after{bottom:0;left:0}
+.cb.br{bottom:-2px;right:-2px}.cb.br::before{bottom:0;right:0}.cb.br::after{bottom:0;right:0}
+.hdr{text-align:center;padding-bottom:24px;margin-bottom:28px;border-bottom:1px solid var(--ol);}
+.sys-label{font-family:var(--orb);font-size:10px;letter-spacing:8px;color:var(--orange);margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);opacity:0;transition:opacity .3s;}
+.save-dot.on{opacity:1}
+.hdr-name{font-family:var(--orb);font-size:32px;font-weight:900;color:#fff;letter-spacing:6px;text-shadow:0 0 20px rgba(255,107,0,0.5);margin-bottom:4px;}
+.hdr-jp{font-size:11px;color:var(--t2);letter-spacing:4px;margin-bottom:14px;}
+.rank-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:6px;}
+.rank-line{width:36px;height:1px;background:linear-gradient(90deg,transparent,var(--orange));}
+.rank-line.r{background:linear-gradient(90deg,var(--orange),transparent)}
+.rank-badge{padding:6px 22px;border:1px solid var(--orange);border-left:none;border-right:none;color:var(--ob);font-family:var(--orb);font-size:11px;letter-spacing:4px;background:rgba(255,107,0,0.08);position:relative;}
+.rank-badge::before,.rank-badge::after{content:'◆';position:absolute;top:50%;transform:translateY(-50%);color:var(--orange);font-size:7px;}
+.rank-badge::before{left:-12px}.rank-badge::after{right:-12px}
+.rank-basis{font-size:9px;color:var(--t3);letter-spacing:2px;text-align:center;margin-top:4px;}
+.pace-target{font-size:9px;color:var(--t2);letter-spacing:2px;text-align:center;margin-top:4px;}
+
+/* Pace breakdown */
+.pace-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px;}
+.pb-card{border:1px solid var(--ol);background:var(--inner);padding:10px 8px;text-align:center;position:relative;}
+.pb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+.pb-card.foundation{border-color:rgba(255,107,0,.6);}
+.pb-card.foundation::before{background:linear-gradient(90deg,transparent,var(--ob),transparent);}
+.pb-dist{font-family:var(--orb);font-size:8px;color:var(--t3);letter-spacing:2px;margin-bottom:4px;}
+.pb-card.foundation .pb-dist{color:var(--ob);}
+.pb-pace{font-family:var(--orb);font-size:16px;font-weight:900;color:var(--ob);}
+.pb-pace.empty{color:var(--t3);font-size:11px;}
+.pb-weight{font-size:8px;color:var(--t3);margin-top:2px;}
+.pb-card.foundation .pb-weight{color:rgba(255,170,85,.6);}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.stat-box{border:1px solid var(--ol);background:var(--inner);padding:14px 8px;text-align:center;position:relative;}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+.stat-lbl{font-family:var(--orb);font-size:8px;color:var(--t3);letter-spacing:2px;margin-bottom:4px;}
+.stat-val{font-family:var(--orb);font-size:22px;font-weight:900;color:var(--ob);text-shadow:0 0 10px rgba(255,107,0,0.3);}
+.stat-unit{font-size:8px;color:var(--t3);margin-top:2px;letter-spacing:1px;}
+.xp-box{border:1px solid var(--ol);background:var(--inner);padding:14px 20px;margin-bottom:16px;position:relative;}
+.xp-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+.xp-top{display:flex;justify-content:space-between;font-family:var(--orb);font-size:9px;color:var(--t2);letter-spacing:2px;margin-bottom:8px;}
+.xp-track{height:7px;background:rgba(255,107,0,0.1);border:1px solid rgba(255,107,0,0.2);overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,#aa3300,var(--orange),var(--ob));transition:width .5s;}
+.xp-bot{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-top:6px;letter-spacing:1px;}
+.chakra-bar{border:1px solid var(--ol);background:var(--inner);padding:10px 20px;margin-bottom:24px;}
+.chakra-lbl{font-family:var(--orb);font-size:8px;color:var(--t3);letter-spacing:3px;margin-bottom:6px;display:flex;justify-content:space-between;}
+.chakra-track{height:5px;background:rgba(0,170,255,0.1);border:1px solid rgba(68,170,255,0.2);overflow:hidden;}
+.chakra-fill{height:100%;background:linear-gradient(90deg,#0033aa,var(--blue));transition:width .4s;}
+.flash{padding:10px 16px;font-size:10px;margin-bottom:20px;display:none;align-items:center;gap:10px;letter-spacing:1px;border:1px solid;}
+.flash.ok{border-color:rgba(0,255,170,.4);color:var(--green);background:var(--g2);}
+.flash.bad{border-color:rgba(255,51,68,.4);color:var(--red);background:var(--r2);}
+.flash.info{border-color:var(--ol);color:var(--ob);background:var(--og);}
+.sec{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-family:var(--orb);font-size:10px;font-weight:600;letter-spacing:3px;}
+.sec.run{color:var(--ob)}.sec.plan{color:var(--green)}.sec.pr{color:var(--purple)}.sec.badge{color:var(--blue)}.sec.log{color:var(--t2)}
+.sec-line{flex:1;height:1px;}
+.sec.run .sec-line{background:linear-gradient(90deg,var(--ol),transparent)}
+.sec.plan .sec-line{background:linear-gradient(90deg,rgba(0,255,170,.4),transparent)}
+.sec.pr .sec-line{background:linear-gradient(90deg,rgba(170,85,255,.4),transparent)}
+.sec.badge .sec-line{background:linear-gradient(90deg,rgba(68,170,255,.4),transparent)}
+.sec.log .sec-line{background:linear-gradient(90deg,rgba(204,136,68,.4),transparent)}
+.chip{font-family:var(--mono);font-size:8px;padding:2px 8px;border:1px solid;letter-spacing:1px;}
+.sec.run .chip{border-color:var(--ol);color:var(--t2)}
+.sec.plan .chip{border-color:rgba(0,255,170,.4);color:var(--green)}
+.sec.pr .chip{border-color:rgba(170,85,255,.4);color:var(--purple)}
+.sec.badge .chip{border-color:rgba(68,170,255,.4);color:var(--blue)}
+.log-form{border:1px solid var(--ol);background:var(--inner);padding:18px 20px;margin-bottom:22px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.form-field{display:flex;flex-direction:column;gap:4px;}
+.form-lbl{font-family:var(--orb);font-size:8px;color:var(--t3);letter-spacing:2px;}
+.form-input{background:rgba(255,107,0,0.05);border:1px solid var(--ol);color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;outline:none;width:100%;}
+.form-input:focus{border-color:var(--orange);}
+.form-input::placeholder{color:var(--t3);}
+select.form-input option{background:var(--panel);}
+.form-ta{background:rgba(255,107,0,0.05);border:1px solid var(--ol);color:var(--text);font-family:var(--mono);font-size:11px;padding:7px 10px;outline:none;resize:none;width:100%;}
+.form-ta:focus{border-color:var(--orange);}
+.today-badge{font-family:var(--orb);font-size:8px;color:var(--green);letter-spacing:2px;margin-top:3px;}
+.form-btn{width:100%;padding:10px;border:1px solid var(--orange);background:rgba(255,107,0,0.1);color:var(--ob);font-family:var(--orb);font-size:10px;letter-spacing:3px;cursor:pointer;transition:all .2s;}
+.form-btn:hover{background:rgba(255,107,0,0.2);}
+.run-entry{border:1px solid var(--ol);background:var(--inner);padding:14px 18px;margin-bottom:8px;position:relative;}
+.run-entry::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--orange);}
+.run-entry.race-entry::before{background:var(--purple);}
+.run-entry.easy-entry::before{background:var(--green);}
+.run-entry.hard-entry::before{background:var(--red);}
+.run-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.run-date{font-family:var(--orb);font-size:9px;color:var(--t3);letter-spacing:2px;}
+.run-today{font-family:var(--orb);font-size:8px;color:var(--green);letter-spacing:1px;}
+.run-cat{font-family:var(--orb);font-size:8px;padding:2px 8px;border:1px solid;letter-spacing:1px;}
+.cat-easy{border-color:rgba(0,255,170,.3);color:var(--green);background:rgba(0,255,170,.05);}
+.cat-hard{border-color:rgba(255,51,68,.3);color:var(--red);background:rgba(255,51,68,.05);}
+.cat-race{border-color:rgba(170,85,255,.3);color:var(--purple);background:rgba(170,85,255,.05);}
+.cat-tempo{border-color:rgba(255,107,0,.3);color:var(--ob);background:rgba(255,107,0,.05);}
+.cat-long{border-color:rgba(68,170,255,.3);color:var(--blue);background:rgba(68,170,255,.05);}
+.run-pr-badge{font-family:var(--orb);font-size:8px;padding:2px 8px;border:1px solid var(--purple);color:var(--purple);background:rgba(170,85,255,.1);letter-spacing:1px;}
+.run-stats{display:flex;gap:20px;flex-wrap:wrap;}
+.run-stat{display:flex;flex-direction:column;}
+.run-stat-lbl{font-size:8px;color:var(--t3);letter-spacing:1px;}
+.run-stat-val{font-family:var(--orb);font-size:14px;font-weight:700;color:var(--ob);}
+.run-notes{font-size:10px;color:var(--t2);margin-top:6px;font-style:italic;border-top:1px solid rgba(255,107,0,0.1);padding-top:6px;}
+.run-delete{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:12px;}
+.run-delete:hover{color:var(--red);}
+.pr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:22px;}
+.pr-card{border:1px solid var(--ol);background:var(--inner);padding:12px 8px;text-align:center;position:relative;}
+.pr-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);}
+.pr-card.has-pr{border-color:rgba(170,85,255,.4);}
+.pr-card.foundation-pr{border-color:rgba(255,107,0,.6);}
+.pr-card.foundation-pr::before{background:linear-gradient(90deg,transparent,var(--ob),transparent);}
+.pr-dist{font-family:var(--orb);font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:4px;}
+.pr-card.foundation-pr .pr-dist{color:var(--ob);}
+.pr-pace{font-family:var(--orb);font-size:16px;font-weight:900;color:var(--purple);}
+.pr-card.foundation-pr .pr-pace{color:var(--ob);}
+.pr-pace.empty{color:var(--t3);font-size:11px;}
+.pr-time{font-size:8px;color:var(--t3);margin-top:2px;}
+.pr-date{font-size:8px;color:var(--t3);margin-top:2px;}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:22px;}
+.badge-card{border:1px solid;padding:10px;text-align:center;}
+.badge-card.locked{border-color:rgba(100,70,30,.3);background:rgba(10,5,0,.5);opacity:.5;}
+.badge-card.unlocked{border-color:rgba(68,170,255,.4);background:rgba(0,20,50,.5);position:relative;}
+.badge-card.unlocked::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.badge-icon{font-size:20px;margin-bottom:4px;}
+.badge-name{font-family:var(--orb);font-size:8px;color:var(--blue);letter-spacing:1px;margin-bottom:2px;}
+.badge-card.locked .badge-name{color:var(--t3);}
+.badge-sub{font-size:7px;color:var(--t3);letter-spacing:0.5px;}
+.badge-date{font-size:7px;color:var(--blue);margin-top:3px;}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px;}
+.day-card{border:1px solid rgba(255,107,0,.2);background:var(--inner);padding:8px 4px;text-align:center;transition:all .2s;position:relative;}
+.day-card.rest{border-color:rgba(100,70,30,.2);background:rgba(5,3,0,.5);}
+.day-card.completed{border-color:rgba(0,255,170,.3);background:rgba(0,20,10,.5);}
+.day-card.completed::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.day-card.today-card{border-color:var(--orange);}
+.day-name{font-family:var(--orb);font-size:7px;color:var(--t3);letter-spacing:1px;margin-bottom:3px;}
+.day-date-num{font-size:8px;color:var(--t3);margin-bottom:3px;}
+.day-type{font-size:8px;font-weight:600;margin-bottom:2px;}
+.day-type.easy{color:var(--green)}.day-type.tempo{color:var(--ob)}.day-type.long{color:var(--blue)}.day-type.rest-t{color:var(--t3)}.day-type.race{color:var(--purple)}.day-type.hard{color:var(--red)}
+.day-dist{font-size:7px;color:var(--t3);}
+.week-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.week-nav-btn{background:none;border:1px solid var(--ol);color:var(--ob);font-family:var(--orb);font-size:9px;letter-spacing:2px;padding:4px 12px;cursor:pointer;}
+.week-nav-btn:hover{background:var(--og);}
+.week-label{font-family:var(--orb);font-size:10px;color:var(--t2);letter-spacing:3px;}
+.week-progress{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-bottom:8px;letter-spacing:1px;}
+.overlay{position:fixed;inset:0;background:rgba(5,2,0,.94);display:flex;align-items:center;justify-content:center;z-index:99;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.on{opacity:1;pointer-events:all}
+.ov-box{position:relative;max-width:480px;width:90%;border:1px solid var(--orange);background:var(--panel);padding:40px 48px;text-align:center;}
+.ov-box.win{border-color:var(--purple);}
+.ov-box.rank{border-color:var(--orange);}
+.ov-notif{font-family:var(--orb);font-size:9px;letter-spacing:5px;color:var(--ob);margin-bottom:18px;}
+.ov-box.win .ov-notif{color:var(--purple);}
+.ov-deco{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;}
+.ov-line{width:50px;height:1px;background:var(--orange);}
+.ov-box.win .ov-line{background:var(--purple);}
+.ov-dia{width:8px;height:8px;border:2px solid var(--orange);transform:rotate(45deg);}
+.ov-box.win .ov-dia{border-color:var(--purple);}
+.ov-rank{font-family:var(--orb);font-size:20px;font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:8px;}
+.ov-sub{font-size:10px;color:var(--t2);letter-spacing:2px;margin-bottom:28px;}
+.ov-btn{padding:10px 36px;border:1px solid var(--orange);background:var(--og);color:var(--ob);font-family:var(--orb);font-size:9px;letter-spacing:3px;cursor:pointer;}
+.ov-box.win .ov-btn{border-color:var(--purple);color:var(--purple);background:rgba(170,85,255,.1);}
+.div-line{height:1px;margin:22px 0;background:linear-gradient(90deg,transparent,var(--ol),transparent);position:relative;}
+.div-line::before{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--orange);font-size:7px;background:var(--panel);padding:0 6px;}
+.ftr{display:flex;justify-content:space-between;align-items:center;padding-top:20px;margin-top:14px;border-top:1px solid var(--ol);flex-wrap:wrap;gap:12px;}
+.streak-wrap{display:flex;align-items:center;gap:12px;}
+.streak-val{font-family:var(--orb);font-size:38px;font-weight:900;color:var(--orange);text-shadow:0 0 16px rgba(255,107,0,.4);}
+.streak-lbl{font-family:var(--orb);font-size:9px;color:var(--t3);letter-spacing:3px;}
+.streak-days{font-family:var(--orb);font-size:9px;color:var(--t3);letter-spacing:2px;align-self:flex-end;margin-bottom:3px;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{padding:8px 16px;font-family:var(--orb);font-size:9px;letter-spacing:2px;border:1px solid var(--ol);background:transparent;cursor:pointer;color:var(--t2);transition:all .2s;}
+.btn:hover{border-color:var(--orange);color:var(--ob);background:var(--og);}
+.btn.danger{border-color:rgba(255,51,68,.4);color:var(--red);}
+.btn.danger:hover{border-color:var(--red);background:var(--r2);}
+.empty-log{font-size:10px;color:var(--t3);padding:20px;text-align:center;border:1px solid rgba(255,107,0,.1);letter-spacing:1px;}
+.scroll-list{max-height:400px;overflow-y:auto;}
+.scroll-list::-webkit-scrollbar{width:4px;}.scroll-list::-webkit-scrollbar-track{background:var(--inner);}.scroll-list::-webkit-scrollbar-thumb{background:var(--ol);}
+@media(max-width:500px){
+  .hdr-name{font-size:24px;letter-spacing:3px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .pace-breakdown{grid-template-columns:repeat(3,1fr)}
+  .week-grid{grid-template-columns:repeat(4,1fr)}
+  .form-grid,.form-grid-3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="overlay" id="ov">
+  <div class="ov-box" id="ov-box">
+    <div class="ov-notif" id="ov-notif"></div>
+    <div class="ov-deco"><div class="ov-line"></div><div class="ov-dia"></div><div class="ov-line"></div></div>
+    <div class="ov-rank" id="ov-rank"></div>
+    <div class="ov-sub" id="ov-sub"></div>
+    <button class="ov-btn" id="ov-btn">ACKNOWLEDGE</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="cb tl"></div><div class="cb tr"></div><div class="cb bl"></div><div class="cb br"></div>
+  <div class="hdr">
+    <div class="sys-label">◆ &nbsp;忍者ランニングシステム&nbsp; ◆ <span class="save-dot" id="save-dot"></span></div>
+    <div class="hdr-name">RUNNER &nbsp;·&nbsp; DREW</div>
+    <div class="hdr-jp">ドリュー · ランナー · 走者</div>
+    <div class="rank-wrap">
+      <div class="rank-line"></div>
+      <div class="rank-badge" id="rank-badge">ACADEMY STUDENT · 学生</div>
+      <div class="rank-line r"></div>
+    </div>
+    <div class="rank-basis" id="rank-basis">Rank based on weighted pace — 5km (50%) · 10km (30%) · 21km (20%)</div>
+    <div class="pace-target" id="pace-target"></div>
+  </div>
+
+  <!-- Pace Breakdown -->
+  <div class="pace-breakdown">
+    <div class="pb-card foundation">
+      <div class="pb-dist">⭐ 5KM PACE · 基礎</div>
+      <div class="pb-pace" id="pb-5km">--:--</div>
+      <div class="pb-weight">50% weight · 基準</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-dist">10KM PACE</div>
+      <div class="pb-pace" id="pb-10km">--:--</div>
+      <div class="pb-weight">30% weight</div>
+    </div>
+    <div class="pb-card">
+      <div class="pb-dist">21KM PACE</div>
+      <div class="pb-pace" id="pb-21km">--:--</div>
+      <div class="pb-weight">20% weight</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-lbl">WEIGHTED PACE · 総合</div><div class="stat-val" id="stat-pace">--:--</div><div class="stat-unit">min/km overall</div></div>
+    <div class="stat-box"><div class="stat-lbl">TOTAL KM · 総距離</div><div class="stat-val" id="stat-km">0</div><div class="stat-unit">kilometers</div></div>
+    <div class="stat-box"><div class="stat-lbl">TOTAL RUNS · 合計</div><div class="stat-val" id="stat-runs">0</div><div class="stat-unit">runs logged</div></div>
+    <div class="stat-box"><div class="stat-lbl">THIS WEEK · 今週</div><div class="stat-val" id="stat-week">0</div><div class="stat-unit">km this week</div></div>
+  </div>
+
+  <div class="xp-box">
+    <div class="xp-top"><span>NINJA XP · 忍者経験値</span><span><span id="xp-cur">0</span> / <span id="xp-need">500</span></span></div>
+    <div class="xp-track"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
+    <div class="xp-bot"><span>RANK PROGRESS · ランク進捗</span><span><span id="xp-left">500</span> XP TO NEXT RANK</span></div>
+  </div>
+  <div class="chakra-bar">
+    <div class="chakra-lbl"><span>WEEKLY CHAKRA · 週間チャクラ</span><span id="chakra-label">0 / 4 runs</span></div>
+    <div class="chakra-track"><div class="chakra-fill" id="chakra-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="flash" id="flash"><i class="ti ti-info-circle" style="font-size:14px"></i><span id="flash-msg"></span></div>
+
+  <!-- LOG A RUN -->
+  <div class="sec run"><i class="ti ti-run" style="font-size:14px"></i>LOG A RUN · ランを記録<div class="sec-line"></div></div>
+  <div class="log-form">
+    <div class="form-grid">
+      <div class="form-field">
+        <div class="form-lbl">DATE · 日付</div>
+        <input class="form-input" type="date" id="f-date">
+        <div class="today-badge" id="today-indicator"></div>
+      </div>
+      <div class="form-field">
+        <div class="form-lbl">CATEGORY · カテゴリ</div>
+        <select class="form-input" id="f-cat">
+          <option value="easy">Easy Run · 易しい</option>
+          <option value="tempo">Tempo Run · テンポ</option>
+          <option value="long">Long Run · 長距離</option>
+          <option value="hard">Hard / Interval · ハード</option>
+          <option value="race">Race · レース</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid-3">
+      <div class="form-field">
+        <div class="form-lbl">DISTANCE (KM) · 距離</div>
+        <input class="form-input" type="number" id="f-dist" placeholder="e.g. 10.5" step="0.1" min="0">
+      </div>
+      <div class="form-field">
+        <div class="form-lbl">TIME (MM:SS or H:MM:SS)</div>
+        <input class="form-input" type="text" id="f-time" placeholder="e.g. 52:30">
+      </div>
+      <div class="form-field">
+        <div class="form-lbl">RACE DISTANCE · レース距離</div>
+        <select class="form-input" id="f-rdist">
+          <option value="">Not a race / training</option>
+          <option value="3">3km</option>
+          <option value="5">5km</option>
+          <option value="7">7km</option>
+          <option value="10">10km</option>
+          <option value="12">12km</option>
+          <option value="16">16km</option>
+          <option value="21">21km (Half Marathon)</option>
+          <option value="42">42km (Full Marathon)</option>
+          <option value="fun">Fun Run</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field" style="margin-bottom:12px">
+      <div class="form-lbl">NOTES · メモ</div>
+      <textarea class="form-ta" id="f-notes" rows="2" placeholder="How did it feel? Weather, route, race name..."></textarea>
+    </div>
+    <button class="form-btn" onclick="logRun()">+ LOG THIS RUN · 記録する</button>
+  </div>
+
+  <!-- WEEKLY PLAN -->
+  <div class="sec plan"><i class="ti ti-calendar" style="font-size:14px"></i>TRAINING PLAN · 訓練計画<span class="chip" id="week-chip">WEEK 1</span><div class="sec-line"></div></div>
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="prevWeek()">◀ PREV</button>
+    <div class="week-label" id="week-label">WEEK 1</div>
+    <button class="week-nav-btn" onclick="nextWeek()">NEXT ▶</button>
+  </div>
+  <div class="week-progress" id="week-progress"></div>
+  <div class="week-grid" id="week-grid"></div>
+
+  <!-- PRs -->
+  <div class="sec pr"><i class="ti ti-trophy" style="font-size:14px"></i>PERSONAL RECORDS · 自己ベスト<span class="chip">JUTSU SCROLLS · 巻物</span><div class="sec-line"></div></div>
+  <div class="pr-grid" id="pr-grid"></div>
+
+  <!-- BADGES -->
+  <div class="sec badge"><i class="ti ti-shield" style="font-size:14px"></i>MISSION BADGES · ミッション<span class="chip" id="badge-chip">0 EARNED</span><div class="sec-line"></div></div>
+  <div class="badge-grid" id="badge-grid"></div>
+
+  <div class="div-line"></div>
+
+  <!-- LOG -->
+  <div class="sec log"><i class="ti ti-list" style="font-size:14px"></i>RUN LOG · ミッションログ<span class="chip" id="log-chip">0 RUNS</span><div class="sec-line"></div></div>
+  <div class="scroll-list" id="run-log"></div>
+
+  <div class="ftr">
+    <div class="streak-wrap">
+      <i class="ti ti-flame" style="font-size:22px;color:var(--orange)"></i>
+      <div>
+        <div class="streak-lbl">STREAK · 連続</div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="streak-val" id="streak-val">0</div>
+          <div class="streak-days">DAYS</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="exportData()">EXPORT · エクスポート</button>
+      <button class="btn danger" onclick="clearSave()">CLEAR SAVE · リセット</button>
+    </div>
+  </div>
+</div>
+<script>
+const KEY='runner_drew_v1';
+
+const RANKS=[
+  {l:'Academy Student · 学生',   pace:null, xp:0},
+  {l:'Genin · 下忍',             pace:830,  xp:500},
+  {l:'Chunin · 中忍',            pace:800,  xp:1200},
+  {l:'Jonin · 上忍',             pace:730,  xp:2500},
+  {l:'ANBU · 暗部',              pace:700,  xp:4500},
+  {l:'Elite Jonin · 精鋭上忍',   pace:630,  xp:7000},
+  {l:'Kage · 影',                pace:600,  xp:10000},
+  {l:'Hokage · 火影',            pace:530,  xp:14000},
+  {l:'Minato · 黄色い閃光',      pace:500,  xp:19000},
+  {l:'Naruto · 七代目',          pace:430,  xp:25000},
+  {l:'Baryon Mode · 陽遁モード', pace:400,  xp:32000},
+  {l:'Hagoromo · 六道仙人',      pace:330,  xp:40000},
+  {l:'Kaguya · 大筒木カグヤ',   pace:300,  xp:50000},
+  {l:'Isshiki · イッシキ',       pace:230,  xp:62000},
+  {l:'Momoshiki · モモシキ',     pace:200,  xp:75000},
+];
+
+const PR_CATS=[
+  {id:'3km', label:'3km',       icon:'⚡', foundation:false},
+  {id:'5km', label:'5km ⭐',    icon:'🔥', foundation:true},
+  {id:'7km', label:'7km',       icon:'💫', foundation:false},
+  {id:'10km',label:'10km',      icon:'🌀', foundation:false},
+  {id:'12km',label:'12km',      icon:'💨', foundation:false},
+  {id:'16km',label:'16km',      icon:'🌟', foundation:false},
+  {id:'21km',label:'21km Half', icon:'🏅', foundation:false},
+  {id:'42km',label:'42km Full', icon:'👑', foundation:false},
+];
+
+const BADGES=[
+  {id:'first_run', name:'First Mission',    jp:'初任務',         icon:'🎯', desc:'Log your first run',             check:s=>s.runs.length>=1},
+  {id:'10runs',    name:'10 Missions',      jp:'10任務',         icon:'📜', desc:'Complete 10 runs',               check:s=>s.runs.length>=10},
+  {id:'50km',      name:'50km Journey',     jp:'50km旅',         icon:'🗾', desc:'Log 50km total',                 check:s=>totalKm(s)>=50},
+  {id:'100km',     name:'100km Warrior',    jp:'百km戦士',       icon:'⚔️', desc:'Log 100km total',                check:s=>totalKm(s)>=100},
+  {id:'first3',    name:'3km Scroll',       jp:'3km巻物',        icon:'📕', desc:'Complete a 3km race',            check:s=>!!(s.races&&s.races['3'])},
+  {id:'first5',    name:'5km Scroll',       jp:'5km巻物',        icon:'📗', desc:'Complete a 5km race',            check:s=>!!(s.races&&s.races['5'])},
+  {id:'first7',    name:'7km Scroll',       jp:'7km巻物',        icon:'📓', desc:'Complete a 7km race',            check:s=>!!(s.races&&s.races['7'])},
+  {id:'first10',   name:'10km Scroll',      jp:'10km巻物',       icon:'📘', desc:'Complete a 10km race',           check:s=>!!(s.races&&s.races['10'])},
+  {id:'first12',   name:'12km Scroll',      jp:'12km巻物',       icon:'📙', desc:'Complete a 12km race',           check:s=>!!(s.races&&s.races['12'])},
+  {id:'first16',   name:'16km Scroll',      jp:'16km巻物',       icon:'📒', desc:'Complete a 16km race',           check:s=>!!(s.races&&s.races['16'])},
+  {id:'first21',   name:'Half Marathon',    jp:'ハーフマラソン',  icon:'🏅', desc:'Complete a 21km race',           check:s=>!!(s.races&&s.races['21'])},
+  {id:'first42',   name:'Full Marathon',    jp:'フルマラソン',    icon:'🏆', desc:'Complete a 42km race',           check:s=>!!(s.races&&s.races['42'])},
+  {id:'sub30_5',   name:'Sub 30 5km',       jp:'5km30分切り',    icon:'⚡', desc:'Run 5km under 30 min',           check:s=>!!(s.prs&&s.prs['5km']&&s.prs['5km'].pace<=360)},
+  {id:'sub60_10',  name:'Sub 60 10km',      jp:'10km60分切り',   icon:'⏱️', desc:'Run 10km under 60 min',          check:s=>!!(s.prs&&s.prs['10km']&&s.prs['10km'].pace<=600)},
+  {id:'sub2hr_21', name:'Sub 2hr Half',     jp:'2時間切りハーフ', icon:'🌟', desc:'Half marathon under 2 hours',   check:s=>!!(s.prs&&s.prs['21km']&&s.prs['21km'].time<7200)},
+  {id:'streak7',   name:'7-Day Streak',     jp:'7日連続',        icon:'🔥', desc:'Run 7 days in a row',            check:s=>(s.streak||0)>=7},
+  {id:'pr_broken', name:'Jutsu Learned',    jp:'術を習得',       icon:'🌀', desc:'Break any personal record',      check:s=>(s.totalPRs||0)>=1},
+  {id:'chunin',    name:'Chunin Reached',   jp:'中忍到達',       icon:'🍃', desc:'Reach Chunin rank',              check:s=>(s.rankIdx||0)>=2},
+  {id:'jonin',     name:'Jonin Reached',    jp:'上忍到達',       icon:'⚔️', desc:'Reach Jonin rank',               check:s=>(s.rankIdx||0)>=3},
+  {id:'kage',      name:'Kage Reached',     jp:'影到達',         icon:'👑', desc:'Reach Kage rank',               check:s=>(s.rankIdx||0)>=6},
+];
+
+const WEEK_PLANS=[
+  [{type:'easy',dist:5},{type:'rest'},{type:'tempo',dist:6},{type:'rest'},{type:'easy',dist:5},{type:'long',dist:10},{type:'rest'}],
+  [{type:'easy',dist:6},{type:'rest'},{type:'tempo',dist:7},{type:'rest'},{type:'hard',dist:6},{type:'long',dist:12},{type:'rest'}],
+  [{type:'easy',dist:6},{type:'rest'},{type:'tempo',dist:8},{type:'rest'},{type:'easy',dist:6},{type:'long',dist:14},{type:'rest'}],
+  [{type:'easy',dist:5},{type:'rest'},{type:'tempo',dist:6},{type:'rest'},{type:'easy',dist:5},{type:'race',dist:10},{type:'rest'}],
+];
+const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+
+function DEF(){return{runs:[],prs:{},races:{},xp:0,rankIdx:0,streak:0,lastRunDate:null,totalPRs:0,badges:{},weekOffset:0};}
+
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function parsePace(timeStr,dist){
+  if(!timeStr||!dist||dist===0)return null;
+  const parts=timeStr.split(':');
+  if(parts.length<2)return null;
+  let totalSecs=0;
+  if(parts.length===2)totalSecs=parseInt(parts[0])*60+parseInt(parts[1]);
+  else if(parts.length===3)totalSecs=parseInt(parts[0])*3600+parseInt(parts[1])*60+parseInt(parts[2]);
+  if(isNaN(totalSecs)||totalSecs<=0)return null;
+  return Math.round(totalSecs/dist);
+}
+function parseTime(timeStr){
+  if(!timeStr)return null;
+  const parts=timeStr.split(':');
+  if(parts.length===2)return parseInt(parts[0])*60+parseInt(parts[1]);
+  if(parts.length===3)return parseInt(parts[0])*3600+parseInt(parts[1])*60+parseInt(parts[2]);
+  return null;
+}
+function fmtPace(secs){
+  if(!secs||secs<=0)return '--:--';
+  const m=Math.floor(secs/60);const s=secs%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+function fmtTime(secs){
+  if(!secs)return '--';
+  const h=Math.floor(secs/3600);const m=Math.floor((secs%3600)/60);const s=secs%60;
+  if(h>0)return h+'h '+m+'m '+(s<10?'0':'')+s+'s';
+  return m+'m '+(s<10?'0':'')+s+'s';
+}
+function totalKm(s){return(s.runs||[]).reduce((a,r)=>a+(parseFloat(r.dist)||0),0);}
+function thisWeekKm(s){
+  const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);
+  return(s.runs||[]).filter(r=>new Date(r.date)>=mon).reduce((a,r)=>a+(parseFloat(r.dist)||0),0);
+}
+function thisWeekRuns(s){
+  const now=new Date();const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);
+  return(s.runs||[]).filter(r=>new Date(r.date)>=mon).length;
+}
+
+// Weighted pace: 5km=50%, 10km=30%, 21km=20%
+// If a distance is missing, redistribute weight proportionally
+function calcWeightedPace(prs){
+  const slots=[
+    {key:'5km', w:0.50},
+    {key:'10km',w:0.30},
+    {key:'21km',w:0.20},
+  ];
+  const available=slots.filter(s=>prs[s.key]);
+  if(!available.length)return null;
+  const totalW=available.reduce((a,s)=>a+s.w,0);
+  let weighted=0;
+  available.forEach(s=>weighted+=(prs[s.key].pace*(s.w/totalW)));
+  return Math.round(weighted);
+}
+
+function getRankFromPace(pace){
+  if(!pace)return 0;
+  let idx=0;
+  for(let i=RANKS.length-1;i>=0;i--){
+    if(RANKS[i].pace&&pace<=RANKS[i].pace){idx=i;break;}
+  }
+  return idx;
+}
+
+let S=DEF();
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(DEF(),JSON.parse(r));}catch(e){}
+let flashT=null,saveT=null,ovQueue=[];
+
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  const d=document.getElementById('save-dot');d.classList.add('on');
+  if(saveT)clearTimeout(saveT);saveT=setTimeout(()=>d.classList.remove('on'),1200);
+}
+function showFlash(msg,type){
+  const b=document.getElementById('flash');b.className='flash '+type;
+  document.getElementById('flash-msg').textContent=msg;b.style.display='flex';
+  if(flashT)clearTimeout(flashT);flashT=setTimeout(()=>b.style.display='none',5000);
+}
+function showOv(notif,rank,sub,cls){
+  ovQueue.push({notif,rank,sub,cls});
+  if(ovQueue.length===1)displayNextOv();
+}
+function displayNextOv(){
+  if(!ovQueue.length)return;
+  const{notif,rank,sub,cls}=ovQueue[0];
+  const box=document.getElementById('ov-box');
+  box.className='ov-box'+(cls?' '+cls:'');
+  document.getElementById('ov-notif').textContent=notif;
+  document.getElementById('ov-rank').textContent=rank;
+  document.getElementById('ov-sub').textContent=sub;
+  document.getElementById('ov').classList.add('on');
+}
+document.getElementById('ov-btn').onclick=()=>{
+  document.getElementById('ov').classList.remove('on');
+  ovQueue.shift();
+  if(ovQueue.length)setTimeout(displayNextOv,300);
+};
+
+function checkBadges(){
+  BADGES.forEach(b=>{
+    if(!(S.badges||{})[b.id]&&b.check(S)){
+      if(!S.badges)S.badges={};
+      S.badges[b.id]={earned:true,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
+      setTimeout(()=>showOv('[ BADGE UNLOCKED · バッジ獲得 ]',b.icon+' '+b.name,b.jp+' — '+b.desc,'win'),500);
+    }
+  });
+}
+
+// Date indicator
+function updateDateIndicator(){
+  const val=document.getElementById('f-date').value;
+  const ind=document.getElementById('today-indicator');
+  if(val===todayStr())ind.textContent='◆ TODAY · 今日';
+  else if(val)ind.textContent='◆ PAST DATE · 過去の日付';
+  else ind.textContent='';
+}
+document.getElementById('f-date').addEventListener('change',updateDateIndicator);
+
+function logRun(){
+  const date=document.getElementById('f-date').value;
+  const dist=parseFloat(document.getElementById('f-dist').value);
+  const timeStr=document.getElementById('f-time').value.trim();
+  const cat=document.getElementById('f-cat').value;
+  const rdist=document.getElementById('f-rdist').value;
+  const notes=document.getElementById('f-notes').value.trim();
+
+  if(!date){showFlash('Please enter a date · 日付を入力してください','bad');return;}
+  if(!dist||dist<=0){showFlash('Please enter a valid distance · 距離を入力してください','bad');return;}
+  if(!timeStr){showFlash('Please enter your time · タイムを入力してください','bad');return;}
+  const pace=parsePace(timeStr,dist);
+  if(!pace){showFlash('Invalid time — use MM:SS (e.g. 52:30) or H:MM:SS · 無効なタイム形式','bad');return;}
+  const totalSecs=parseTime(timeStr);
+  if(!totalSecs){showFlash('Invalid time format','bad');return;}
+
+  const run={id:Date.now(),date,dist,time:totalSecs,pace,cat,rdist:rdist||null,notes,pr:false,xpGained:0};
+  const isToday=date===todayStr();
+
+  // PR check for tagged race distance
+  let isPR=false;
+  const prKey=rdist&&rdist!=='fun'?(rdist+'km'):null;
+  if(prKey){
+    if(!S.prs[prKey]||pace<S.prs[prKey].pace){
+      const oldPR=S.prs[prKey];
+      S.prs[prKey]={pace,time:totalSecs,date,dist};
+      run.pr=true;isPR=true;
+      S.totalPRs=(S.totalPRs||0)+1;
+      const improvement=oldPR?fmtPace(oldPR.pace)+' → '+fmtPace(pace):'First time!';
+      setTimeout(()=>showOv('[ NEW RECORD · 自己ベスト更新! ]','🌀 JUTSU LEARNED · 術習得',prKey+' — '+fmtPace(pace)+'/km · '+improvement,'win'),600);
+    }
+  }
+
+  // Mark race
+  if(rdist&&rdist!=='fun'&&rdist!==''){
+    if(!S.races)S.races={};
+    S.races[rdist]=true;
+  }
+
+  // XP: 10 per km + PR bonus + race bonus
+  const xpGained=Math.round(dist*10)+(isPR?100:0)+(cat==='race'?50:0);
+  S.xp+=xpGained;
+  run.xpGained=xpGained;
+
+  // Streak — only update for today's runs
+  if(isToday){
+    if(!S.lastRunDate){
+      S.streak=1;
+    }else{
+      const last=new Date(S.lastRunDate);const curr=new Date(date);
+      const diff=Math.round((curr-last)/86400000);
+      if(diff===1)S.streak=(S.streak||0)+1;
+      else if(diff>1)S.streak=1;
+      // diff===0: same day, no change
+    }
+    S.lastRunDate=date;
+  }
+
+  S.runs.unshift(run);
+
+  // Recalculate weighted rank
+  const wp=calcWeightedPace(S.prs);
+  if(wp){
+    const newRankIdx=getRankFromPace(wp);
+    if(newRankIdx>(S.rankIdx||0)){
+      const oldRank=RANKS[S.rankIdx||0];
+      const newRank=RANKS[newRankIdx];
+      S.rankIdx=newRankIdx;
+      setTimeout(()=>showOv('[ RANK UP · ランクアップ! ]',newRank.l,'昇格 · '+oldRank.l+' → '+newRank.l,'rank'),800);
+    }
+  }
+
+  checkBadges();
+  save();renderAll();
+
+  const msg='Run logged'+(isToday?' (TODAY · 今日)':'('+date+')')+' — +'+xpGained+' XP'+(isPR?' · NEW PR! 🌀':'')+(cat==='race'?' · RACE +50XP':'');
+  showFlash(msg,'ok');
+
+  // Reset form but keep today's date
+  document.getElementById('f-dist').value='';
+  document.getElementById('f-time').value='';
+  document.getElementById('f-notes').value='';
+  document.getElementById('f-rdist').value='';
+  document.getElementById('f-cat').value='easy';
+  document.getElementById('f-date').value=todayStr();
+  updateDateIndicator();
+}
+
+function deleteRun(id){
+  if(!confirm('Delete this run? · このランを削除しますか？'))return;
+  S.runs=S.runs.filter(r=>r.id!==id);
+  // Recalc PRs + races from scratch
+  S.prs={};S.totalPRs=0;S.races={};
+  S.runs.slice().reverse().forEach(r=>{
+    if(r.rdist&&r.rdist!=='fun'){
+      const key=r.rdist+'km';
+      if(!S.prs[key]||r.pace<S.prs[key].pace){
+        S.prs[key]={pace:r.pace,time:r.time,date:r.date,dist:r.dist};
+        S.totalPRs++;
+      }
+      S.races[r.rdist]=true;
+    }
+  });
+  // Recalc rank
+  const wp=calcWeightedPace(S.prs);
+  S.rankIdx=wp?getRankFromPace(wp):0;
+  save();renderAll();showFlash('Run deleted · ラン削除完了','info');
+}
+
+function prevWeek(){S.weekOffset=(S.weekOffset||0)-1;save();renderWeek();}
+function nextWeek(){S.weekOffset=(S.weekOffset||0)+1;save();renderWeek();}
+
+function getWeekDates(offset){
+  const now=new Date();const mon=new Date(now);
+  mon.setDate(now.getDate()-((now.getDay()+6)%7)+(offset*7));
+  const dates=[];
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);dates.push(d);}
+  return dates;
+}
+
+function renderWeek(){
+  const offset=S.weekOffset||0;
+  const planIdx=((offset%WEEK_PLANS.length)+WEEK_PLANS.length)%WEEK_PLANS.length;
+  const plan=WEEK_PLANS[planIdx];
+  const dates=getWeekDates(offset);
+  const td=todayStr();
+
+  document.getElementById('week-chip').textContent='WEEK '+(offset+1);
+  document.getElementById('week-label').textContent='WEEK '+(offset+1)+(offset===0?' · THIS WEEK':'');
+
+  const wRuns=thisWeekRuns(S);const wKm=thisWeekKm(S).toFixed(1);
+  const planKm=plan.filter(d=>d.type!=='rest').reduce((a,d)=>a+(d.dist||0),0);
+  document.getElementById('week-progress').innerHTML=
+    '<span>RUNS: '+wRuns+' / 3-4 this week</span><span>KM: '+wKm+' / '+planKm+'km planned</span>';
+
+  const grid=document.getElementById('week-grid');grid.innerHTML='';
+  const typeLabels={easy:'EASY',tempo:'TEMPO',long:'LONG',hard:'HARD',race:'RACE',rest:'REST'};
+  plan.forEach((day,i)=>{
+    const date=dates[i];
+    const dateStr=date.toISOString().split('T')[0];
+    const hasRun=S.runs.some(r=>r.date===dateStr);
+    const isToday=dateStr===td;
+    const card=document.createElement('div');
+    card.className='day-card'+(day.type==='rest'?' rest':'')+(hasRun?' completed':'')+(isToday?' today-card':'');
+    card.innerHTML=
+      '<div class="day-name">'+DAYS[i]+'</div>'+
+      '<div class="day-date-num">'+date.getDate()+'</div>'+
+      '<div class="day-type '+(day.type==='rest'?'rest-t':day.type)+'">'+typeLabels[day.type]+'</div>'+
+      (day.dist?'<div class="day-dist">'+day.dist+'km</div>':'')+
+      (hasRun?'<div style="font-size:10px;color:var(--green);margin-top:2px">✓</div>':'')+
+      (isToday&&!hasRun?'<div style="font-size:7px;color:var(--orange);margin-top:2px">TODAY</div>':'');
+    grid.appendChild(card);
+  });
+}
+
+function renderPRs(){
+  const grid=document.getElementById('pr-grid');grid.innerHTML='';
+  PR_CATS.forEach(cat=>{
+    const pr=S.prs[cat.id];
+    const card=document.createElement('div');
+    card.className='pr-card'+(pr?' has-pr':'')+(cat.foundation?' foundation-pr':'');
+    card.innerHTML=
+      '<div class="pr-dist">'+cat.icon+' '+cat.label+'</div>'+
+      (pr
+        ?'<div class="pr-pace">'+fmtPace(pr.pace)+'</div><div class="pr-time">/km · '+fmtTime(pr.time)+'</div><div class="pr-date">'+pr.date+'</div>'
+        :'<div class="pr-pace empty">NO PR YET</div><div class="pr-time">記録なし</div>');
+    grid.appendChild(card);
+  });
+}
+
+function renderBadges(){
+  const grid=document.getElementById('badge-grid');grid.innerHTML='';
+  const earned=Object.keys(S.badges||{}).length;
+  document.getElementById('badge-chip').textContent=earned+' EARNED';
+  BADGES.forEach(b=>{
+    const unlocked=(S.badges||{})[b.id];
+    const card=document.createElement('div');
+    card.className='badge-card '+(unlocked?'unlocked':'locked');
+    card.innerHTML=
+      '<div class="badge-icon">'+b.icon+'</div>'+
+      '<div class="badge-name">'+b.name+'</div>'+
+      '<div style="font-size:7px;color:var(--t3);margin-bottom:2px">'+b.jp+'</div>'+
+      '<div class="badge-sub">'+b.desc+'</div>'+
+      (unlocked&&S.badges[b.id].date?'<div class="badge-date">'+S.badges[b.id].date+'</div>':'');
+    grid.appendChild(card);
+  });
+}
+
+function renderLog(){
+  const list=document.getElementById('run-log');
+  document.getElementById('log-chip').textContent=S.runs.length+' RUN'+(S.runs.length!==1?'S':'');
+  if(!S.runs.length){
+    list.innerHTML='<div class="empty-log">◆ NO RUNS LOGGED YET · ランなし ◆<br><br>Log your first run above, Hunter.</div>';
+    return;
+  }
+  const td=todayStr();
+  const catBadgeClass={easy:'cat-easy',tempo:'cat-tempo',long:'cat-long',hard:'cat-hard',race:'cat-race'};
+  const catLabel={easy:'EASY · 易しい',tempo:'TEMPO · テンポ',long:'LONG · 長距離',hard:'HARD · ハード',race:'RACE · レース'};
+  const entryCls={easy:'easy-entry',hard:'hard-entry',race:'race-entry',tempo:'',long:''};
+  list.innerHTML='';
+  S.runs.forEach(r=>{
+    const isToday=r.date===td;
+    const div=document.createElement('div');
+    div.className='run-entry '+(entryCls[r.cat]||'');
+    const rdistLabel=r.rdist?(r.rdist==='fun'?'FUN RUN':r.rdist+'km'):'';
+    div.innerHTML=`
+      <button class="run-delete" onclick="deleteRun(${r.id})"><i class="ti ti-trash" style="font-size:12px"></i></button>
+      <div class="run-top">
+        <div class="run-date">${r.date}</div>
+        ${isToday?'<span class="run-today">◆ TODAY</span>':''}
+        <span class="run-cat ${catBadgeClass[r.cat]||'cat-easy'}">${catLabel[r.cat]||r.cat}</span>
+        ${r.pr?'<span class="run-pr-badge">🌀 PR</span>':''}
+        ${rdistLabel?'<span class="run-cat cat-race">'+rdistLabel+'</span>':''}
+      </div>
+      <div class="run-stats">
+        <div class="run-stat"><div class="run-stat-lbl">DISTANCE</div><div class="run-stat-val">${parseFloat(r.dist).toFixed(1)}km</div></div>
+        <div class="run-stat"><div class="run-stat-lbl">TIME · タイム</div><div class="run-stat-val">${fmtTime(r.time)}</div></div>
+        <div class="run-stat"><div class="run-stat-lbl">PACE · ペース</div><div class="run-stat-val">${fmtPace(r.pace)}/km</div></div>
+        <div class="run-stat"><div class="run-stat-lbl">XP GAINED</div><div class="run-stat-val" style="color:var(--orange)">+${r.xpGained||0}</div></div>
+      </div>
+      ${r.notes?'<div class="run-notes">'+r.notes+'</div>':''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+function renderAll(){
+  // Weighted pace
+  const wp=calcWeightedPace(S.prs);
+  const rankIdx=S.rankIdx||0;
+  const rank=RANKS[rankIdx];
+  const nextRank=RANKS[rankIdx+1];
+
+  document.getElementById('rank-badge').textContent=rank.l;
+
+  // Show which distances are contributing
+  const has5=!!S.prs['5km'],has10=!!S.prs['10km'],has21=!!S.prs['21km'];
+  const basisParts=[];
+  if(has5)basisParts.push('5km(50%)');
+  if(has10)basisParts.push('10km(30%)');
+  if(has21)basisParts.push('21km(20%)');
+  document.getElementById('rank-basis').textContent=
+    basisParts.length?'Ranked from: '+basisParts.join(' + '):'Log a 5km, 10km, or 21km race to set your rank';
+
+  document.getElementById('pace-target').textContent=nextRank&&nextRank.pace
+    ?'Next: '+nextRank.l+' · Reach '+fmtPace(nextRank.pace)+'/km weighted pace'
+    :(rankIdx>0?'◆ MAXIMUM RANK · 最高ランク ◆':'');
+
+  // Pace breakdown cards
+  document.getElementById('pb-5km').textContent=S.prs['5km']?fmtPace(S.prs['5km'].pace):'--:--';
+  document.getElementById('pb-5km').className='pb-pace'+(S.prs['5km']?'':' empty');
+  document.getElementById('pb-10km').textContent=S.prs['10km']?fmtPace(S.prs['10km'].pace):'--:--';
+  document.getElementById('pb-10km').className='pb-pace'+(S.prs['10km']?'':' empty');
+  document.getElementById('pb-21km').textContent=S.prs['21km']?fmtPace(S.prs['21km'].pace):'--:--';
+  document.getElementById('pb-21km').className='pb-pace'+(S.prs['21km']?'':' empty');
+
+  document.getElementById('stat-pace').textContent=wp?fmtPace(wp):'--:--';
+  document.getElementById('stat-km').textContent=totalKm(S).toFixed(1);
+  document.getElementById('stat-runs').textContent=S.runs.length;
+  document.getElementById('stat-week').textContent=thisWeekKm(S).toFixed(1);
+  document.getElementById('streak-val').textContent=S.streak||0;
+
+  // XP bar
+  const curXp=rank.xp;const nextXp=nextRank?nextRank.xp:rank.xp+10000;
+  const pct=nextRank?Math.min(100,Math.max(0,Math.round(((S.xp-curXp)/(nextXp-curXp))*100))):100;
+  document.getElementById('xp-cur').textContent=S.xp;
+  document.getElementById('xp-need').textContent=nextXp;
+  document.getElementById('xp-bar').style.width=pct+'%';
+  document.getElementById('xp-left').textContent=Math.max(0,nextXp-S.xp);
+
+  const wRuns=thisWeekRuns(S);
+  document.getElementById('chakra-bar').style.width=Math.min(100,Math.round((wRuns/4)*100))+'%';
+  document.getElementById('chakra-label').textContent=wRuns+' / 4 runs this week';
+
+  renderWeek();renderPRs();renderBadges();renderLog();
+}
+
+function exportData(){
+  try{
+    const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='runner_drew_data.json';a.click();
+    showFlash('Exported · エクスポート完了','ok');
+  }catch(e){showFlash('Export not available here — works on GitHub Pages','info');}
+}
+function clearSave(){
+  if(!confirm('Wipe all running data? Cannot be undone. · 全データ削除？'))return;
+  localStorage.removeItem(KEY);location.reload();
+}
+
+// Init
+document.getElementById('f-date').value=todayStr();
+updateDateIndicator();
+renderAll();
+</script>
+</body>
+</html>
